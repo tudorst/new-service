@@ -1,0 +1,6 @@
+(ns {{NS_NAME}}.core-test
+  (:require [clojure.test :refer :all]
+            [{{NS_NAME}}.core :refer :all]))
+
+(deftest hello-test
+  (is (= "Hello, world!" (hello))))

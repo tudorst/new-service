@@ -1,0 +1,288 @@
+# {{SERVICE_NAME}} Microservice
+
+> A production-ready Clojure microservice template with security-first CI/CD, comprehensive testing, and modern development practices.
+
+## 🚀 Quick Start
+
+Welcome! This service template provides everything you need to build, test, and deploy a secure Clojure microservice. Follow these steps to get started:
+
+### Prerequisites
+
+Ensure you have the following installed:
+- [Babashka](https://babashka.org/) (latest version recommended)
+- [Clojure CLI](https://clojure.org/guides/install_clojure) 
+- [Node.js](https://nodejs.org/) (for JavaScript tooling)
+- [Docker](https://docker.com/) (optional, for containerization)
+
+### Initial Setup
+
+```bash
+# 1. Set up local environment configuration
+cp env/.env.example env/.env.local
+
+# 2. Install all dependencies (Clojure + JavaScript)
+bb init
+
+# 3. Run the complete CI pipeline to verify everything works
+bb ci
+```
+
+## 📋 Available Commands
+
+This project uses [Babashka tasks](https://book.babashka.org/#tasks) for automation. Run `bb tasks` to see all available commands:
+
+### 🔧 Development Commands
+
+```bash
+# Install dependencies
+bb init                 # Install both Clojure and npm dependencies
+
+# Testing
+bb test                 # Run all tests (Clojure + JavaScript)
+bb test:clj            # Run only Clojure tests with Kaocha
+bb test:js             # Run only JavaScript tests with Jest
+bb coverage            # Generate test coverage report
+
+# Code Quality
+bb lint                # Run all linters
+bb lint:clj            # Lint Clojure code with clj-kondo
+bb lint:js             # Lint JavaScript code with ESLint
+
+# Security & Auditing
+bb audit:clj           # Check for outdated Clojure dependencies
+bb audit:js            # Audit npm dependencies for vulnerabilities
+bb trivy-scan          # Security scan with Trivy (vulnerabilities + licenses)
+bb trivy-check         # Parse Trivy results and fail on issues
+
+# Build & Deploy
+bb docker-build        # Build Docker image
+bb clean               # Clean up generated files
+```
+
+### 🔍 Comprehensive Quality Checks
+
+```bash
+# Run the complete quality assurance pipeline
+bb check               # Runs: lint + test + audit + security scan
+
+# Run the complete CI pipeline (everything)
+bb ci                  # Runs: init + check + coverage + docker-build
+```
+
+## 🏗️ Development Workflow
+
+### Starting Development
+
+1. **Fork/Clone** this repository
+2. **Set up environment**:
+   ```bash
+   cp env/.env.example env/.env.local
+   # Edit env/.env.local with your local settings
+   ```
+3. **Install dependencies**: `bb init`
+4. **Verify setup**: `bb test`
+
+### Making Changes
+
+1. **Write your code** in `src/{{NS_NAME}}/`
+2. **Write tests** in `test/{{NS_NAME}}/`
+3. **Run tests frequently**: `bb test:clj`
+4. **Check code quality**: `bb lint:clj`
+5. **Before committing**: `bb check`
+
+### Testing Strategy
+
+This template follows comprehensive testing practices:
+
+```bash
+# Unit Tests
+bb test:clj             # Fast feedback during development
+
+# Integration Testing
+# Add integration tests in test/ directory
+# Use fixtures for database/external service setup
+
+# Property-Based Testing
+# Clojure test.check is available for generative testing
+
+# Test Coverage
+bb coverage             # Generates detailed coverage reports
+```
+
+### Code Quality Standards
+
+```bash
+# Linting (enforced in CI)
+bb lint:clj             # clj-kondo for Clojure best practices
+bb lint:js              # ESLint for JavaScript standards
+
+# Dependency Management
+bb audit:clj            # Keep dependencies up-to-date
+bb audit:js             # Check for known vulnerabilities
+
+# Security Scanning
+bb trivy-scan           # Comprehensive security analysis
+# - Scans for HIGH/CRITICAL vulnerabilities
+# - Enforces license compliance (blocks GPL/AGPL/LGPL)
+# - Generates detailed reports
+```
+
+## 🔒 Security Features
+
+This template implements security-first practices:
+
+### Vulnerability Scanning
+- **Trivy integration** for dependency vulnerability scanning
+- **License compliance** enforcement (blocks copyleft licenses)
+- **Automated security updates** via GitHub Actions
+- **SARIF reporting** for GitHub Security tab
+
+### Environment Security
+- **Environment separation**: `.env.local` (dev), `.env.staging`, `.env.production`
+- **Secrets management**: Use environment variables, never commit secrets
+- **Minimal dependencies**: Only essential libraries included
+
+### CI/CD Security
+- **Dependency pinning** with version locks
+- **Security scanning** on every push/PR
+- **Multi-stage Docker builds** for minimal attack surface
+
+## 🐳 Docker Support
+
+Build and run with Docker:
+
+```bash
+# Build image
+bb docker-build
+
+# Run locally (after building)
+docker run -p 3000:3000 {{SERVICE_NAME}}:local
+
+# Production deployment
+docker build -t {{SERVICE_NAME}}:production .
+```
+
+## 📁 Project Structure
+
+```
+{{SERVICE_NAME}}/
+├── src/{{NS_NAME}}/          # Main source code
+│   └── core.clj              # Application entry point
+├── test/{{NS_NAME}}/         # Test files
+│   └── core_test.clj         # Unit tests
+├── env/                      # Environment configurations
+│   ├── .env.example          # Template for environment variables
+│   └── .env.local            # Local development config (gitignored)
+├── .github/workflows/        # CI/CD automation
+│   ├── ci.yml               # Main CI pipeline
+│   └── trivy.yml            # Security scanning
+├── deps.edn                  # Clojure dependencies & aliases
+├── bb.edn                    # Babashka task definitions
+├── package.json              # JavaScript dependencies & scripts
+└── shadow-cljs.edn          # ClojureScript build configuration
+```
+
+## 🔧 Configuration
+
+### Environment Variables
+
+Copy `env/.env.example` to `env/.env.local` and customize:
+
+```bash
+# Application
+PORT=3000                              # Server port
+DATABASE_URL=postgres://localhost/dev  # Database connection
+API_KEY=your-api-key                   # External service keys
+
+# Development
+LOG_LEVEL=debug                        # Logging verbosity
+ENVIRONMENT=local                      # Environment identifier
+```
+
+### Clojure Configuration
+
+Key files and their purposes:
+
+- **`deps.edn`**: Dependencies, aliases, and build configuration
+- **`bb.edn`**: Task automation and project scripts
+- **`shadow-cljs.edn`**: ClojureScript compilation (if needed)
+
+## 🚨 Troubleshooting
+
+### Common Issues
+
+**Dependencies not installing:**
+```bash
+# Clear caches and reinstall
+bb clean
+rm -rf node_modules package-lock.json
+bb init
+```
+
+**Tests failing:**
+```bash
+# Check test configuration
+bb test:clj --verbose
+# Ensure test database is running (if applicable)
+```
+
+**Security scan failures:**
+```bash
+# View detailed security report
+bb trivy-scan
+cat trivy-report.json | jq .
+```
+
+**Docker build issues:**
+```bash
+# Build with verbose output
+docker build -t {{SERVICE_NAME}}:debug . --progress=plain
+```
+
+### Getting Help
+
+1. **Check logs**: Most commands provide detailed output
+2. **Run diagnostics**: `bb check` shows overall project health
+3. **Review documentation**: Each tool has comprehensive docs
+   - [Babashka Book](https://book.babashka.org/)
+   - [Clojure Guides](https://clojure.org/guides/getting_started)
+   - [Kaocha Testing](https://cljdoc.org/d/lambdaisland/kaocha/)
+
+## 🤝 Contributing
+
+### Development Setup
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature/amazing-feature`
+3. Make your changes
+4. Run quality checks: `bb check`
+5. Commit with clear messages
+6. Push and create a Pull Request
+
+### Code Standards
+
+- **Follow Clojure style guide**: Use `bb lint:clj` to verify
+- **Write tests**: Maintain or improve test coverage
+- **Document changes**: Update README/docstrings as needed
+- **Security first**: Run security scans before committing
+
+## 📚 Learning Resources
+
+### Clojure Development
+- [Clojure Official Guide](https://clojure.org/guides/getting_started)
+- [Clojure for the Brave and True](https://www.braveclojure.com/)
+- [ClojureDocs](https://clojuredocs.org/)
+
+### Tools Used
+- [Babashka](https://babashka.org/) - Fast-starting Clojure scripting
+- [Kaocha](https://github.com/lambdaisland/kaocha) - Comprehensive testing
+- [clj-kondo](https://github.com/clj-kondo/clj-kondo) - Clojure linting
+- [Trivy](https://trivy.dev/) - Security scanning
+
+## 📄 License
+
+[Add your license information here]
+
+---
+
+**🎉 Happy Coding!** This template provides a solid foundation for building secure, maintainable Clojure microservices. Questions? Check the troubleshooting section or reach out to the team!

@@ -1,0 +1,43 @@
+# General ignores
+.DS_Store
+.calva/
+.clj-kondo/
+.lsp/
+
+# Clojure-specific ignores
+pom.xml
+pom.xml.asc
+*.jar
+*.class
+/lib/
+/classes/
+/target/
+/checkouts/
+.lein-deps-sum
+.lein-repl-history
+.lein-plugins/
+.lein-failures
+.nrepl-port
+.cpcache/
+.nvd/
+.vscode/
+--*
+dependency-check-report.*
+
+# Project-specific ignores
+.openapi-generator-ignore
+.travis.yml
+.*-env.sh
+dojira.edn
+/specs
+/local
+
+# Log files
+*.log
+nvd*
+
+# specific LLM files
+CLAUDE.md
+.claude
+
+/target

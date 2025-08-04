@@ -1,0 +1,4 @@
+(ns {{NS_NAME}}.core)
+
+(defn hello []
+  "Hello, world!")

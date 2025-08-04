@@ -1,0 +1,6 @@
+env/.env.local
+env/.env.staging
+env/.env.production
+target/
+node_modules/
+trivy-report.json

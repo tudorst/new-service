@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  trivy-scan:
+    uses: ./.github/workflows/trivy.yml
+    with:
+      scan-path: "."
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup
+        uses: DeLaGuardo/setup-clojure@main
+        with:
+          bb: latest
+          clojure: latest
+      - name: Install Deps
+        run: |
+          npm install
+          clojure -P
+      - name: Run Tests
+        run: bb test
+      - name: Run Lint
+        run: bb lint
+      - name: Run Audit
+        run: bb audit-vulns-clj
+      - name: Docker Build
+        run: bb docker-build
+      - name: Upload Trivy Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-report
+          path: trivy-report.json

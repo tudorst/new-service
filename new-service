@@ -1,0 +1,125 @@
+#!/usr/bin/env bb
+
+(ns new-service
+  (:require [babashka.fs :as fs]
+            [clojure.string :as str]))
+
+(defn create-file [path content]
+  (fs/create-dirs (fs/parent path))
+  (spit path content)
+  (println "✅ Created" path))
+
+(defn kebab->ns [s]
+  (str/replace s "-" "_"))
+
+(defn process-template [template-path replacements]
+  (reduce (fn [content [k v]]
+            (str/replace content (str "{{" k "}}") v))
+          (slurp template-path)
+          replacements))
+
+(defn create-from-template [template-file target-path replacements]
+  (let [template-path (str "templates/" template-file)
+        content (process-template template-path replacements)]
+    (create-file target-path content)))
+
+(defn ->project [service & {:keys [parent-dir] :or {parent-dir "."}}]
+  (let [ns-name (kebab->ns service)
+        base-dir (str parent-dir "/" service)
+        replacements {"SERVICE_NAME" service
+                      "NS_NAME" ns-name}]
+    (println "🚀 Creating Clojure service project:" service)
+    
+    ;; Folders
+    (doseq [dir ["src" "test" "env" ".github/workflows"]]
+      (fs/create-dirs (str base-dir "/" dir)))
+
+    ;; Files from templates
+    (create-from-template ".env.example.template" 
+                          (str base-dir "/env/.env.example") 
+                          replacements)
+    
+    (create-from-template ".gitignore.template" 
+                          (str base-dir "/.gitignore") 
+                          replacements)
+    
+    (create-from-template "README.md.template" 
+                          (str base-dir "/README.md") 
+                          replacements)
+    
+    (create-from-template "deps.edn.template" 
+                          (str base-dir "/deps.edn") 
+                          replacements)
+    
+    (create-from-template "shadow-cljs.edn.template" 
+                          (str base-dir "/shadow-cljs.edn") 
+                          replacements)
+    
+    (create-from-template "package.json.template" 
+                          (str base-dir "/package.json") 
+                          replacements)
+    
+    (create-from-template "bb.edn.template" 
+                          (str base-dir "/bb.edn") 
+                          replacements)
+
+    ;; Source & test files
+    (create-from-template "core.clj.template" 
+                          (str base-dir "/src/" ns-name "/core.clj") 
+                          replacements)
+    
+    (create-from-template "core_test.clj.template" 
+                          (str base-dir "/test/" ns-name "/core_test.clj") 
+                          replacements)
+
+    ;; GitHub Actions workflows
+    (create-from-template "workflows/ci.yml.template" 
+                          (str base-dir "/.github/workflows/ci.yml") 
+                          replacements)
+    
+    (create-from-template "workflows/trivy.yml.template" 
+                          (str base-dir "/.github/workflows/trivy.yml") 
+                          replacements)
+
+    (println "🎉 Project created at:" base-dir)))
+
+(defn parse-args
+  "Parse command line arguments and return {:service-name string :parent-dir string}"
+  [args]
+  (loop [remaining args
+         service-name nil
+         parent-dir "."]
+    (cond
+      (empty? remaining)
+      {:service-name service-name :parent-dir parent-dir}
+      
+      (= (first remaining) "--parent-dir")
+      (if (second remaining)
+        (recur (drop 2 remaining) service-name (second remaining))
+        (throw (ex-info "❌ --parent-dir requires a path argument" {})))
+      
+      (str/starts-with? (first remaining) "--")
+      (throw (ex-info (str "❌ Unknown option: " (first remaining)) {}))
+      
+      (nil? service-name)
+      (recur (rest remaining) (first remaining) parent-dir)
+      
+      :else
+      (throw (ex-info "❌ Too many arguments provided" {})))))
+
+;; --- CLI entrypoint ---
+(defn -main [& args]
+  (try
+    (if (empty? args)
+      (println "❌ Please provide a service name\nUsage: ./new-service [--parent-dir <path>] <service-name>")
+      (let [{:keys [service-name parent-dir]} (parse-args args)]
+        (if service-name
+          (->project service-name :parent-dir parent-dir)
+          (println "❌ Please provide a service name\nUsage: ./new-service [--parent-dir <path>] <service-name>"))))
+    (catch Exception e
+      (println (.getMessage e))
+      (println "Usage: ./new-service [--parent-dir <path>] <service-name>"))))
+
+;; Auto-run when script is executed directly
+(when (= *file* (System/getProperty "babashka.file"))
+  (apply -main *command-line-args*))
