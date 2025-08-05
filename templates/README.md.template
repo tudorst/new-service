@@ -1,3 +1,4 @@
+<!-- Template version: 1.0.0 -->
 # {{SERVICE_NAME}} Microservice
 
 > A production-ready Clojure microservice template with security-first CI/CD, comprehensive testing, and modern development practices.

@@ -1,3 +1,4 @@
+;; Template version: 1.0.0
 {:deps {;; For parsing JSON reports from tools like Trivy
         cheshire/cheshire {:mvn/version "5.11.0"}}
 
