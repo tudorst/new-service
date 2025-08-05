@@ -1,4 +1,4 @@
-# Template version: 1.0.1
+# Template version: 1.0.2
 
 # General ignores
 .DS_Store
@@ -14,7 +14,7 @@
 .cpcache/
 .nvd/
 .vscode/
-.shadwow-cljs/
+.shadow-cljs/
 .idea/
 
 # Local environment and outputs
@@ -25,6 +25,8 @@ target/
 node_modules/
 trivy-report.json
 dependency-check-report.*
+resources/local
+
 
 # LLMs
 .claude/
