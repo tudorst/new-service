@@ -1,6 +1,6 @@
 {
-  "//": "-- Template version: 1.0.0 --",
+  "//": "-- Template version: 1.0.1 --",
   "name": "{{SERVICE_NAME}}",
   "scripts": {"lint": "eslint src", "test": "jest"},
-  "devDependencies": {"eslint": "^8.55.0", "jest": "^29.6.0", "license-checker": "^25.0.1"}
+  "devDependencies": {"eslint": "^9.32.0", "jest": "^30.0.2", "license-checker": "^25.0.1"}
 }

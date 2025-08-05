@@ -1,6 +1,33 @@
+# Template version: 1.0.1
+
+# General ignores
+.DS_Store
+.calva/
+.clj-kondo/
+.lsp/
+.cpcache
+.lein-deps-sum
+.lein-repl-history
+.lein-plugins/
+.lein-failures
+.nrepl-port
+.cpcache/
+.nvd/
+.vscode/
+.shadwow-cljs/
+.idea/
+
+# Local environment and outputs
 env/.env.local
 env/.env.staging
 env/.env.production
 target/
 node_modules/
 trivy-report.json
+dependency-check-report.*
+
+# LLMs
+.claude/
+
+# Node
+package-lock.json
